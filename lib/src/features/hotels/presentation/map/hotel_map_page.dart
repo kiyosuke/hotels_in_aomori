@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hotel_in_aomori/gen/assets.gen.dart';
+import 'package:hotel_in_aomori/src/constants/constants.dart';
 import 'package:hotel_in_aomori/src/features/hotels/domain/model/hotel.dart';
 import 'package:hotel_in_aomori/src/features/hotels/presentation/map/hotel_map_state.dart';
 import 'package:hotel_in_aomori/src/features/hotels/presentation/map/search_bar.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HotelMapPage extends ConsumerWidget {
   const HotelMapPage({super.key});
@@ -12,15 +16,12 @@ class HotelMapPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Marker> markers = ref.watch(filteredHotelsProvider).maybeWhen(
-      data: (data) =>
-          data
+          data: (data) => data
               .where((e) =>
-          e.location.latitude != null && e.location.longitude != null)
-              .map((e) =>
-              Marker(
-                point: LatLng(e.location.latitude!, e.location.longitude!),
-                builder: (context) =>
-                    GestureDetector(
+                  e.location.latitude != null && e.location.longitude != null)
+              .map((e) => Marker(
+                    point: LatLng(e.location.latitude!, e.location.longitude!),
+                    builder: (context) => GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
@@ -38,21 +39,22 @@ class HotelMapPage extends ConsumerWidget {
                         color: Colors.red,
                       ),
                     ),
-              ))
+                  ))
               .toList(),
-      orElse: () => const [],
-    );
+          orElse: () => const [],
+        );
     return Scaffold(
       body: Stack(
         children: [
           FlutterMap(
             options: MapOptions(
-              center: LatLng(40.5123296,141.4839067),
+              center: LatLng(40.5123296, 141.4839067),
+              zoom: 12.0,
             ),
             children: [
               TileLayer(
                 urlTemplate:
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: const ['a', 'b', 'c'],
               ),
               MarkerLayer(
@@ -65,6 +67,11 @@ class HotelMapPage extends ConsumerWidget {
             left: 8.0,
             child: SearchBar(),
           ),
+          const Positioned(
+            right: 16.0,
+            bottom: 16.0,
+            child: _MenuArea(),
+          )
         ],
       ),
     );
@@ -83,10 +90,7 @@ class _HotelDetailsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(hotel.name, style: Theme
-              .of(context)
-              .textTheme
-              .headline4),
+          Text(hotel.name, style: Theme.of(context).textTheme.headline4),
           const SizedBox(height: 8.0),
           Text(
             '旅館業法上の種類：${hotel.type}',
@@ -115,6 +119,41 @@ class _HotelDetailsCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyText2,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MenuArea extends StatelessWidget {
+  const _MenuArea();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                showLicensePage(context: context);
+              },
+              icon: const Icon(Icons.info),
+              tooltip: '情報',
+            ),
+            const VerticalDivider(width: 1.0),
+            IconButton(
+              onPressed: () {
+                launchUrl(Uri.parse(Constants.githubRepositoryUrl));
+              },
+              icon: SvgPicture.asset(Assets.icons.markGithub),
+              tooltip: 'GitHub',
+            ),
+          ],
+        ),
       ),
     );
   }

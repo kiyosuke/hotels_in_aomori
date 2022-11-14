@@ -47,6 +47,11 @@ dependencies:
   # Routing
   go_router: ^5.1.5
 
+  # SVG
+  flutter_svg: ^1.1.6
+
+  url_launcher: ^6.1.6
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -79,6 +84,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/resource/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

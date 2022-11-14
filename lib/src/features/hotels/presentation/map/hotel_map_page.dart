@@ -62,10 +62,12 @@ class HotelMapPage extends ConsumerWidget {
               ),
             ],
           ),
-          const Positioned(
-            top: 8.0,
-            left: 8.0,
-            child: SearchBar(),
+          const Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SearchBar(),
+            ),
           ),
           const Positioned(
             right: 16.0,

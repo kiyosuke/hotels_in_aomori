@@ -22,7 +22,7 @@ jobs:
       - run: flutter pub get
       - name: Build
         run: |
-          flutter build web --web-renderer html
+          flutter build web --web-renderer html --base-href "/hotels_in_aomori/"
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:

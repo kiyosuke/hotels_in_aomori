@@ -19,28 +19,34 @@ class HotelMapPage extends ConsumerWidget {
           data: (data) => data
               .where((e) =>
                   e.location.latitude != null && e.location.longitude != null)
-              .map((e) => Marker(
-                    point: LatLng(e.location.latitude!, e.location.longitude!),
-                    builder: (context) => GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(16.0),
-                              topRight: Radius.circular(16.0),
-                            ),
-                          ),
-                          builder: (context) => _HotelDetailsCard(hotel: e),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.red,
+              .map((e) {
+            final Color color;
+            if (e.type == '旅館・ホテル') {
+              color = Colors.red;
+            } else if (e.type == '下宿') {
+              color = Colors.green;
+            } else {
+              color = Colors.blue;
+            }
+            return Marker(
+              point: LatLng(e.location.latitude!, e.location.longitude!),
+              builder: (context) => GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0),
                       ),
                     ),
-                  ))
-              .toList(),
+                    builder: (context) => _HotelDetailsCard(hotel: e),
+                  );
+                },
+                child: Icon(Icons.location_on, color: color),
+              ),
+            );
+          }).toList(),
           orElse: () => const [],
         );
     return Scaffold(
@@ -73,7 +79,12 @@ class HotelMapPage extends ConsumerWidget {
             right: 16.0,
             bottom: 16.0,
             child: _MenuArea(),
-          )
+          ),
+          const Positioned(
+            left: 16.0,
+            bottom: 16.0,
+            child: _MarkerExampleArea(),
+          ),
         ],
       ),
     );
@@ -92,7 +103,10 @@ class _HotelDetailsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(hotel.name, style: Theme.of(context).textTheme.headline4),
+          SelectableText(
+            hotel.name,
+            style: Theme.of(context).textTheme.headline4,
+          ),
           const SizedBox(height: 8.0),
           Text(
             '旅館業法上の種類：${hotel.type}',
@@ -157,6 +171,57 @@ class _MenuArea extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _MarkerExampleArea extends StatelessWidget {
+  const _MarkerExampleArea();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Row(
+        children: const [
+          _MarkerExample(
+            title: '旅館・ホテル',
+            marker: Icon(Icons.location_on, color: Colors.red),
+          ),
+          SizedBox(width: 4.0),
+          _MarkerExample(
+            title: '下宿',
+            marker: Icon(Icons.location_on, color: Colors.green),
+          ),
+          SizedBox(width: 4.0),
+          _MarkerExample(
+            title: '簡易宿泊所',
+            marker: Icon(Icons.location_on, color: Colors.blue),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MarkerExample extends StatelessWidget {
+  final String title;
+  final Widget marker;
+
+  const _MarkerExample({super.key, required this.title, required this.marker});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        marker,
+        const SizedBox(height: 4.0),
+        Text(title, style: Theme.of(context).textTheme.caption)
+      ],
     );
   }
 }
